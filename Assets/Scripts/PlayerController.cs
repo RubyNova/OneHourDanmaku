@@ -1,6 +1,6 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -8,7 +8,8 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D _rigidbody;
     [SerializeField] private float _moveSpeed;
     [SerializeField] private ShootingController _shootingController;
-
+    [SerializeField] float _health = 2;
+    
     [Header("Bindings"), SerializeField]
     private KeyCode _moveUpKey = KeyCode.UpArrow;
     [SerializeField] private KeyCode _moveDownKey = KeyCode.DownArrow;
@@ -21,9 +22,10 @@ public class PlayerController : MonoBehaviour
 
     private PlayerDirections _moveDirections;
     private PlayerDirections _shootDirections;
-    
+
+
     // Start is called before the first frame update
-    void FixedUpdate()
+    private void FixedUpdate()
     {
         var inputVector = Vector2.zero;
         switch (_moveDirections)
@@ -71,7 +73,7 @@ public class PlayerController : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         if (Input.GetKey(_moveUpKey) && !Input.GetKey(_moveDownKey)) _moveDirections |= PlayerDirections.Up;
         else _moveDirections &= ~PlayerDirections.Up;
@@ -96,5 +98,13 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKey(_shootRightKey) && !Input.GetKey(_shootLeftKey)) _shootDirections |= PlayerDirections.Right;
         else _shootDirections &= ~PlayerDirections.Right;
+    }
+
+    public void TakeDamage(float amount)
+    {
+        _health -= amount;
+        if (_health > 0) return;
+
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }
