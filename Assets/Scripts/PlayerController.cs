@@ -27,6 +27,8 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     private void FixedUpdate()
     {
+        _shootingController.Shoot(_shootDirections);
+        
         var inputVector = Vector2.zero;
         switch (_moveDirections)
         {
@@ -93,8 +95,8 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKey(_shootDownKey) && !Input.GetKey(_shootUpKey)) _shootDirections |= PlayerDirections.Down;
         else _shootDirections &= ~PlayerDirections.Down;
         
-        if (Input.GetKey(_shootLeftKey) && !Input.GetKey(_shootRightKey)) _shootDirections |= PlayerDirections.Right;
-        else _shootDirections &= ~PlayerDirections.Right;
+        if (Input.GetKey(_shootLeftKey) && !Input.GetKey(_shootRightKey)) _shootDirections |= PlayerDirections.Left;
+        else _shootDirections &= ~PlayerDirections.Left;
 
         if (Input.GetKey(_shootRightKey) && !Input.GetKey(_shootLeftKey)) _shootDirections |= PlayerDirections.Right;
         else _shootDirections &= ~PlayerDirections.Right;

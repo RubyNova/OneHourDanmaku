@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class ShootingController : MonoBehaviour
@@ -6,10 +7,12 @@ public class ShootingController : MonoBehaviour
     [SerializeField] private GameObject _bulletPrefab;
     [SerializeField] private float _cooldown = 0.1f;
 
+    public bool IsReady => _currentCooldown <= 0;
+
     private float _currentCooldown;
     public void Shoot(PlayerDirections direction)
     {
-        if (_currentCooldown > 0) return;
+        if (!IsReady) return;
         _currentCooldown = _cooldown;
         
         var inputVector = Vector2.zero;
@@ -46,13 +49,10 @@ public class ShootingController : MonoBehaviour
                 ApplyDown();
                 ApplyRight();
                 break;
-            default:
-                throw new ArgumentOutOfRangeException();
         }
-
         var transformCache = transform;
-        transformCache.rotation = Quaternion.Euler(inputVector);
-        Instantiate(_bulletPrefab, transformCache.position, transformCache.rotation);
+        LookAt2d(inputVector);
+        var bla = Instantiate(_bulletPrefab, transformCache.position, transformCache.rotation);
         
         void ApplyRight() => inputVector.x = 1;
         void ApplyLeft() => inputVector.x = -1;
@@ -60,11 +60,26 @@ public class ShootingController : MonoBehaviour
         void ApplyUp() => inputVector.y = 1;
     }
 
-    public void Shoot(Vector2 direction)
+    public void Shoot(IEnumerable<float> directions)
     {
+        if (!IsReady) return;
+        _currentCooldown = _cooldown;
+        
         var transformCache = transform;
-        transformCache.rotation = Quaternion.Euler(direction);
-        Instantiate(_bulletPrefab, transformCache.position, transformCache.rotation);
+        foreach (var angle in directions)
+        {
+            transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+            Instantiate(_bulletPrefab, transformCache.position, transformCache.rotation);
+        }
+    }
+
+    private void LookAt2d(Vector2 dir)
+    {
+        transform.up = dir;
+/*        var angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Euler(0, 0, angle);
+        print(transform.rotation);
+        Debug.DrawLine(transform.position, (transform.up + transform.position) * 5);*/
     }
 
     private void Update() => _currentCooldown -= Time.deltaTime;
